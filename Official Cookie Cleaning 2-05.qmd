@@ -1,0 +1,733 @@
+---
+title: "Official Cookie Overview"
+author: "Julian (VP) & Julia (President) from Montgomery College Data Science Club"
+format: html
+editor: visual
+# I really like the cyborg theme but most people won't
+theme: cosmo
+---
+
+## [Welcome to our Data Science Club Project Page!!!!!!!]{style="align-items: center, color: \"#2B0948"} {style="align: center"}
+
+
+**Join our club!** We meet on Thursdays at 3pm in SW 308 (Rockville Campus science building). Here is a link to our [club Discord](https://discord.gg/btzk8jFb) (GitHub link coming soon, check back later).
+
+Our Spring semester project involves working with a dataset of about 10,000 cookie recipes scraped from the internet. We're done with the web scraping but happy to share how we did it if you're curious.
+
+Our goal is to analyze patterns in cookie recipes and correlations between ingredients, quantity of ingredients, and cookie recipe ratings. Ultimately we want to make a statistical model that will predict a cookie recipe's quality based on its ratings, so we can make the best, most average, and worst cookie recipes we can come up with. We can then make the cookies and take a survey on people's opinions of the cookies.
+
+Right now we're on the data preparation (data cleaning) phase. **We need help!** More information will be coming, but for right now, please come to the club or join our Discord if you're interested!\ 
+You can use any coding language you want. We also need to peer review the code that gets used to clean the data to make sure it's being done right (which is another thing we need help with)\
+
+
+#### Informal AI Guideline
+
+Because we want to make sure that we're cleaning the data properly, and since this project is just for fun, we prefer that people avoid using AI excessively. We have no problems with using it as a tool or sharing AI generated code to adjust, but please avoid using it to write your code for you. If you send AI generated scripts, just say they're AI generated. This is just informal so there's obviously no "punishment" for violating it, just please don't do that, it's a bit annoying
+
+
+
+
+## Data
+
+```{r include = FALSE}
+library(ggplot2)
+library(tidyverse)
+library(extrafont)
+
+
+
+
+cleancookie <- read_csv("cleancookie.csv") # 1
+cookiesandcups <- read_csv("cookiesandcupscookierecipes.csv") # 2
+cookierookie <- read_csv("cookierookiecookies.csv") # 3
+iambaker <- read_csv("iambakercookierecipes.csv") # 4
+preppycookies <- read_csv("preppykitchencookierecipes.csv") # 5
+lizzyt <- read_csv("tasteoflizzytcookierecipes.csv") # 6
+modernhoney <- read_csv("modernhoneycookierecipes.csv") # 7
+sallysbaking <- read_csv("sallysbakingaddictioncookierecipes.csv") # 8
+BBCcookies <- read_csv("UNFILTERED_Old_bbcgoodfoodcookierecipes.csv") # 9
+bakedbree <- read_csv("bakedbreecookierecipes.csv") # 10
+floralapron <- read_csv("floralaproncookierecipes.csv") # 11
+dessertdime <- read_csv("dessertsonadimecookierecipes.csv") # 12
+insanecookies <- read_csv("insanelygoodcookierecipes.csv") # 13
+bostongirl <- read_csv("bostongirlbakescookierecipes.csv") # 14
+chefspencil <- read_csv("chefspencilcookierecipes.csv") # 15
+veena <- read_csv("veenaazamovkitchencookierecipes.csv") # 16
+olivemagazine <- read_csv("olivemagazinecookierecipes.csv") # 17
+egglesscook <- read_csv("egglesscookingcookierecipes.csv") # 18
+sucrecafe <- read_csv("cafesucrefarinecookierecipes.csv") # 19
+browneye <- read_csv("browneyedbakercookierecipes.csv") # 20
+bigman <- read_csv("thebigmanscookierecipes.csv") # 21
+kouppa <- read_csv("miakouppacookierecipes.csv") # 22
+mummy <- read_csv("amummytoocookierecipes.csv") # 23
+amanda <- read_csv("amadascookincookierecipes.csv") # 24
+tastesbetterfromscratch <- read_csv("tastesbetterfromscratchcookierecipes.csv") # 25
+naptime <- read_csv("iheartnaptimecookierecipes.csv") # 26
+daringgourmet <- read_csv("daringgourmetcookierecipes.csv") # 27 
+tasteofhome <- read_csv("tasteofhomecookierecipes.csv") # 28
+mommyscooking <- read_csv("mommyshomecookingcookierecipes.csv") # 29
+lordbyron <- read_csv("lordbyronskitchencookierecipes.csv") # 30
+mybakingaddiction <- read_csv("mybakingaddictioncookierecipes.csv") # 31
+funcookierecipes <- read_csv("funcookierecipescookierecipes.csv") # 32
+maureenabood <- read_csv("maureenaboodcookierecipes.csv") # 33
+americastestkitchen <- read_csv("americastestkitchencookierecipes.csv") # gotten
+bakernature <- read_csv("bakerbynaturecookierecipes.csv")
+familycookie <- read_csv("familycookierecipescookierecipes.csv")
+broma <- read_csv("bromabakerycookierecipes.csv")
+hearteating <- read_csv("ihearteatingcookierecipes.csv")
+tastingtable <- read_csv("tastingtablecookierecipes.csv")
+
+# bakeitwithlove <- read_csv("bakeitwithlovecookierecipes.csv")
+
+totalrows <- (nrow(cleancookie) + nrow(cookiesandcups) + nrow(cookierookie) + nrow(iambaker) + nrow(preppycookies) + nrow(lizzyt) + nrow(modernhoney) + nrow(sallysbaking) + nrow(BBCcookies) + nrow(bakedbree) + nrow(floralapron) + nrow(dessertdime) + nrow(insanecookies) + nrow(bostongirl) + nrow(chefspencil) + nrow(veena) + nrow(olivemagazine) + nrow(egglesscook) + nrow(sucrecafe) + nrow(browneye) + nrow(bigman) + nrow(kouppa) + nrow(mummy) + nrow(amanda) + nrow(tastesbetterfromscratch) + nrow(naptime) + nrow(daringgourmet) + nrow(tasteofhome) + nrow(mommyscooking) + nrow(lordbyron) + nrow(mybakingaddiction) + nrow(funcookierecipes) + nrow(maureenabood) + nrow(americastestkitchen) + nrow(bakernature)  + nrow(familycookie) + nrow(broma) + nrow(hearteating) + nrow(tastingtable)) 
+
+
+# BBCcookies <- BBCcookies[grepl("biscuit|ookie|shortbread|bars|oatcake|snickerdoodle|dodgers|gingerbread|biscotti|macaroon|macaron", BBCcookies$title, ignore.case = TRUE), ]
+```
+
+
+
+Overall, we have 39 datasets and a total of `r totalrows` rows. Most datasets have about 200 rows. We're going to need to clean nearly all the columns and filter out rows that aren't actually cookie recipes. This document includes descriptions of every individual data source/dataset, but almost all of the cleaning will be done on one combined dataset.\
+
+### Overall issues
+
+All (or nearly all) datasets have these columns (full definition on GitHub):
+
+| title     | author | rating | ratingnum | prep | cook | total   | yield      | totalingredients | ingredient1    |
+|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|
+| Choc Chip | Sally  | 4.7    | 1813      | 15 mins   | 20 mins   | 2 hrs 5 mins | 26 cookies | 10               | 2 stick butter |
+ Some of them have additional columns like genre, course, cuisine, number of steps, and list of steps. The "ingredientX" columns go up to the total number of ingredients.
+
+Here are some issues:
+
+**First and foremost**, my computer crashed when trying to join all the datasets together, so we'll have to figure out how to do that 🙂.
+
+1.  **Ingredients that are not ingredients**: Some (probably most) datasets have things like "filling:", "optional", "shredded" etc included in their `ingredientX` columns. These are also added to the `totalingredients` rows for these recipes.\
+    How to fix this:\
+
+-   Remove everything that lacks numbers and comb through what's removed (because some of them say "salt" or "sprinkles", which many recipe authors don't give measurements to)\
+-   Remove everything that ends with ":" (`ingredients[!grepl(":$", ingredients)]` is one way to do that - literally read as "remove every ingredient that ends with :", `:$` is regex meaning "ends with `:`")\
+-   Make this an if statement or whatever and subtract 1 from `totalingredients` for every ingredient removed (and then shift everything back in the `ingredientX` columns)\
+2. **Empty ingredient columns in the middle of a row**: Some datasets (like Cookie Rookie) have empty or NA ingredientX columns in the middle of a row, so you'll have ingredient1-5 with actual ingredients, and then NA or empty space in ingredients6-9, and then ingredients10-14, for example.\
+3.  **Different sources use different terms for the same ingredients**. Eg, "caster sugar" vs "superfine sugar", "all purpose flour" vs "white flour". The AllRecipes dataset has a standard way that they refer to ingredients (thankfully) so that's not a concern for that dataset (and we might want to follow the standard for AllRecipes when cleaning everything else)\
+4.  **Fractions are sometimes written as symbols** in the ingredients, and all needs to be turned to decimals (Julia can fix this.)\
+5.  **Measurements need to be converted to grams**. Most recipes use cups, tablespoons, etc. Here is an extensive [ingredient conversion chart from King Arthur Baking](https://www.kingarthurbaking.com/learn/ingredient-weight-chart) and here's a [Python ingredient conversion program on GitHub](https://github.com/justinmklam/recipe-converter) that I haven't looked at\
+6.  **A lot of recipes are NOT ACTUALLY COOKIES!!!!!**!!!!\
+    How to fix this:
+
+-   Filter recipes that have cookie words in the title (what I wrote before was `grepl("biscuit|ookie|shortbread|bars|snickerdoodle|dodgers|biscotti", title, ignore.case = TRUE)`, although "biscuit" is risky. "ookie" includes both cookie and brookie and other puns - including pizookie)\
+-   Search through what is removed and search for sugar, molasses, honey, sweetener etc and pick out actual cookie recipes that were removed (most cookies will appear just under sugar, but some cookies have honey or molasses and not sugar, eg the greek cookie moustokouloura, which isn't called an immediately recognizable "cookie" word)\
+7.  **Measurement and ingredient will need to be separated** in some way for modeling\
+8.  **Not every dataset has prep/cook/total time set up properly**. Some websites used the same html element to refer to different things, so some datasets have the label prep/cook/etc time in the rows. These need to be turned into columns and rows (we managed to do something like this before, so we can do it again.)\
+9.  **The "yield" or "servings" columns in different datasets are different** and these columns are very unique (eg, "servings: 28 cookies", vs "servings: 28", vs "servings: 4 5-cookie servings")\
+10.  **Some recipes MIGHT be AI.** I don't think so, but I have encountered AI cookie recipes while working on this. It would be great if someone could click through the links to data sources below and make sure they don't see any clearly AI generated recipes in there. If you find anything like that, send it in the club Discord!\
+
+
+### Original Datasets
+
+Most cleaning will be done to all the data joined into one dataset, but the problems with each are detailed here. Some parts of the cleaning may also be easier to do individually (like filtering for non cookie recipes or fixing ingredients columns - maybe)\
+
+::: {.panel-tabset .nav-pills}
+## AllRecipes
+
+
+`r ncol(cleancookie)` columns x `r nrow(cleancookie)` rows
+
+(info TBA)
+```{r}
+
+```
+
+
+## America's Test Kitchen
+
+[America's Test Kitchen](https://www.americastestkitchen.com/recipes/cookies)
+
+`r ncol(americastestkitchen)` columns x `r nrow(americastestkitchen)` rows
+
+**Should all be cookie recipes.** Scraped from the offiical cookie section.
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients: 1:2, 5:6, 10, 13
+summary(americastestkitchen[c(1, 3:4, 7, 9)])
+```
+
+
+**Notes**\
+1. **All ingredients & steps are repeated three (3) times!**\
+2. "Author" column needs brief cleaning; formatted like this: `r americastestkitchen$author[1]`\
+3. Columns `time` and `yield` also formatted oddly. This website doesn't have prep/cook/total like most. Column `time` is basically total time but some mention cooling, eg, "`r americastestkitchen$time[1]`" or "`r americastestkitchen$time[4]`"\
+
+## A Mummy Too
+
+[A Mummy Too](https://www.amummytoo.co.uk/category/cookies)
+
+`r ncol(mummy)` columns x `r nrow(mummy)` rows
+
+**Should all be cookies.** Scraped from the cookie category: https://www.amummytoo.co.uk/category/cookies
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(mummy[c(1, 3:4, 12, 14)])
+
+table(mummy$course)
+table(mummy$cuisine)
+```
+
+## Amanda's Cookin
+
+[Amanda's Cookin](https://amandascookin.com/category/recipes/desserts/cookies-brownies-and-bars)
+
+`r ncol(amanda)` columns x `r nrow(amanda)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(amanda[c(1, 3:4, 14, 16)])
+
+table(amanda$cuisine)
+table(amanda$category1)
+table(amanda$category2)
+```
+**Cookies, brownies, and bars.** Scraped from the cookie/brownie/bar section: https://amandascookin.com/category/recipes/desserts/cookies-brownies-and-bars
+
+
+## Baked Bree
+
+[Baked Bree](https://bakedbree.com/category/food/cookies)
+
+`r ncol(bakedbree)` columns x `r nrow(bakedbree)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(bakedbree[c(1, 3:4, 10:11)])
+table(bakedbree$cuisine)
+```
+**Should all be cookies.** Scraped from cookie section: https://bakedbree.com/category/food/cookies
+
+
+## Baker By Nature
+
+[Baker By Nature](https://bakerbynature.com/recipe-index/?_desserts=cookies)
+
+`r ncol(bakernature)` columns x `r nrow(bakernature)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(bakernature[c(4:5, 15, 17)])
+
+table(bakernature$cuisine)
+table(bakernature$course)
+```
+**Should all be cookies.** Scraped from the cookie section: https://bakerbynature.com/recipe-index/?_desserts=cookies
+
+## BBC Good Food
+
+[BBC Good Food homepage](https://www.bbcgoodfood.com/)\
+also known as Goodfood.com, British/international food website
+
+`r ncol(BBCcookies)` columns x `r nrow(BBCcookies)` rows
+
+**NOT all recipes are cookies**. Website was scraped from a search for "cookies".
+
+```{r echo = FALSE}
+# 1, 3:4, 7, length(unique(categories)),`r BBCcookies$INFOCARD[1]`
+summary(BBCcookies[c(1, 3:4, 7)])
+```
+
+```{r message=FALSE, warning=FALSE}
+length(unique(BBCcookies$categories))
+```
+
+Categories with the most rows:
+```{r echo = FALSE}
+
+bb <- BBCcookies %>% 
+  group_by(categories) %>% 
+  #summarise(count = n()) %>% 
+  filter(n() > 20) #%>% 
+  #arrange(desc(count))
+
+# cat("Categories with the most rows:")
+table(bb$categories)
+```
+
+
+
+`r BBCcookies$INFOCARD[1]`
+
+
+
+## Big Man's World
+
+[Big Man's World](https://thebigmansworld.com/category/healthy-desserts/healthy-cookies)
+
+
+`r ncol(bigman)` columns x `r nrow(bigman)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(bigman[c(1, 3:4, 12:13, 15)])
+cat("Unique items in Big Man's Category Column")
+table(bigman$category)
+cat("Unique in course")
+table(bigman$course)
+cat("Unique in cuisine")
+table(bigman$cuisine)
+```
+
+**Should all be cookies.** Scraped from the cookie section: https://thebigmansworld.com/category/healthy-desserts/healthy-cookies
+
+
+## Boston Girl Bakes
+
+[Boston Girl Bakes](https://www.bostongirlbakes.com/category/cookies)
+
+`r ncol(bostongirl)` columns x `r nrow(bostongirl)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(bostongirl[c(1, 3:4, 9)])
+```
+**Should all be cookies.** Scraped from cookie section: https://www.bostongirlbakes.com/category/cookies
+
+- ingredients were taken incorrectly, so there will be non-ingredients in the `ingredientX` columns, and they will add to the `totalingredients` columns.\
+- there is no NA in the `ratingnum` column. instead, where `rating` has NA, `ratingnum` has 0. this is actually ideal, most of the datasets don't have this, they just have NA for both.\
+
+## Chef's Pencil
+
+[Chef's Pencil](https://www.chefspencil.com/recipe-courses/dessert/cookies)
+
+`r ncol(chefspencil)` columns x `r nrow(chefspencil)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(chefspencil[c()])
+
+table(chefspencil$cuisine) # lol what is "international"
+```
+**Should all be cookies.** Scraped from cookie section: https://www.chefspencil.com/recipe-courses/dessert/cookies
+
+- "number of steps" seems like it might be inaccurate (although this applies to any datasets with the number of steps)
+
+## Broma Bakery
+
+[Broma Bakery](https://bromabakery.com/category/desserts/cookies)
+
+`r ncol(broma)` columns x `r nrow(broma)` rows
+
+**Should all be cookies**, scraped from cookie category: https://bromabakery.com/category/desserts/cookies
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+#  course, cuisine empty custom & yield/servings needs to be cleaned on every single one but it could easily just be done together
+summary(broma[c(4:5, 12, 14)])
+table(broma$category)
+```
+
+- No servings/yield
+
+## Brown Eyed Baker
+
+[Brown Eyed Baker](https://www.browneyedbaker.com/recipes/desserts/cookie-recipes)
+
+`r ncol(browneye)` columns x `r nrow(browneye)` rows
+
+**Should all be cookies**, scraped from cookie category: https://www.browneyedbaker.com/recipes/desserts/cookie-recipes
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+#  course, cuisine empty custom & yield/servings needs to be cleaned on every single one but it could easily just be done together
+summary(browneye[c(1, 3:4, 12, 14)])
+table(browneye$course)
+table(browneye$cuisine)
+```
+
+- Empty "custom time" column
+
+## Cafe Sucre Farine
+
+[Cafe Sucre Farine](https://thecafesucrefarine.com/category/cookies-bars)
+
+
+`r ncol(sucrecafe)` columns x `r nrow(sucrecafe)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(sucrecafe[c(3:4, 11:12, 14)])
+
+table(sucrecafe$course)
+table(sucrecafe$cuisine)
+```
+
+**Should all be cookies (and bars).** Scraped from cookie category: https://thecafesucrefarine.com/category/cookies-bars
+
+- Only **one** recipe has servings info (but if that means this data has to be removed, it's only 94 rows)\
+
+
+## Cookies & Cups
+
+[Cookies & Cups](https://cookiesandcups.com/recipes/cookies/)
+
+`r ncol(cookiesandcups)` columns x `r nrow(cookiesandcups)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients: 1:2, 5:6, 10, 13
+summary(cookiesandcups[c(1:2, 5:6, 10, 13)])
+
+table(cookiesandcups$category)
+table(cookiesandcups$cuisine)
+
+```
+
+**Should all be cookies.** Scraped from cookie category: https://cookiesandcups.com/recipes/cookies/
+
+## Cookie Rookie
+
+[Cookie Rookie](https://www.thecookierookie.com/category/cookies)
+
+`r ncol(cookierookie)` columns x `r nrow(cookierookie)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(cookierookie[c(1:2, 4:5, 9:10)])
+```
+
+- Ingredients not scraped properly. Non-ingredients will be in the columns and adding to the totalingredients.
+
+## Cooking with my Kids
+
+TBA (British website)
+
+## Daring Gourmet
+
+[Daring Gourmet](https://www.daringgourmet.com)
+
+`r ncol(daringgourmet)` columns x `r nrow(daringgourmet)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(daringgourmet[c(3:4, 12, 14)])
+
+cat("Unique items in course")
+table(daringgourmet$course)
+cat("Unique items in cuisine")
+table(daringgourmet$cuisine)
+
+
+# ⚠️ NOTE: the "steps number" is messed up. the formatting on the website is weird. it might be better to separate them by "\n" but it also doesn't really matter # ⚠️extra note: some ingredients say things like "Day [#]:", this will add to the total ingredient count # ⚠️ in need of serious cleaning # ⚠️ the non-cookies are NOT reliably going to say "cookie" because the author is german and might just call things lebkuchen and not "lebkuchen (gingerbread cookie)", etc
+
+```
+
+**Not all cookies.** Scrape off search results for "cookie" on the website https://www.daringgourmet.com/?s=cookie
+
+- Ingredients column includes things like "Day#:" (for multiple day long recipes) as their own ingredient. This will add to the `totalingredients` columns for rows with that. Filter for things adding in `:` to remove these. \
+- "number of steps" is incorrect on a decent amount of recipes because of weird website formatting\
+- Filtering title by 'cookie' **might not work** with this dataset, but filtering by searching for "cookie" in any row might (some of the titles say "Authentic Pfeffernüsse", but pfeffernüsse is a cookie)\
+
+## Desserts on a Dime
+
+[Desserts on a Dime](https://dessertsonadime.com/category/recipe-by-type/cookies)
+
+`r ncol(dessertdime)` columns x `r nrow(dessertdime)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(dessertdime[c(3, 5, 9:11)]) 
+
+table(dessertdime$cuisine)
+```
+
+**Should all be cookies.** Scraped from cookie category: https://dessertsonadime.com/category/recipe-by-type/cookies
+
+- The "servings" column looks really off. I might have done something wrong while scraping it
+
+## Eggless Cooking
+
+[Eggless Cooking](https://www.egglesscooking.com/eggless-baking-recipes/eggless-cookies/)
+
+`r ncol(egglesscook)` columns x `r nrow(egglesscook)` rows
+
+
+```{r echo = FALSE}
+ #check out cuisine & course, categories1, 
+# title author rating/num yield totalingredients
+summary(egglesscook[c(3:4, 10, 12)])
+
+cat("Unique items in cuisine")
+table(egglesscook$cuisine)
+```
+
+**Should all be cookies.** Scraped from cookie section: https://www.egglesscooking.com/eggless-baking-recipes/eggless-cookies/ 
+
+
+## Family Cookie Recipes
+
+[Family Cookie Recipes](https://familycookierecipes.com/blog/)
+
+`r ncol(familycookie)` columns x `r nrow(familycookie)` rows
+
+```{r echo = FALSE}
+ #check out cuisine & course, categories1, 
+# title author rating/num yield totalingredients
+summary(familycookie[c(4:5, 16, 18)])
+
+table(familycookie$cuisine)
+```
+**SHOULD be all cookie recipes**, because the website only has cookie recipes, but this was scraped off the website's search results/recipe index. Also some of these are dog cookies\ 
+- ingredients scraped properly\ 
+- steps included \
+- **very few recipes have ratings**\
+- empty "customtime" column (remove)\
+
+## Floral Apron
+
+`r ncol(floralapron)` columns x `r nrow(floralapron)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(floralapron[c(3:4, 11)])
+
+table(floralapron$category)
+table(floralapron$cuisine)
+```
+
+Only 25 recipes
+
+## Fun Cookie Recipes
+
+`r ncol(funcookierecipes)` columns x `r nrow(funcookierecipes)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+# 5:6, 14, 16
+summary(funcookierecipes[c(5:6, 14, 16)])
+
+table(funcookierecipes$category1)
+```
+
+- Empty "update" column (just remove that)\
+
+## I Heart Naptime
+
+`r ncol(naptime)` columns x `r nrow(naptime)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(naptime[c()])
+```
+
+## I Am Baker
+
+`r ncol(iambaker)` columns x `r nrow(iambaker)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(iambaker[c()])
+```
+
+## I Heart Eating
+
+`r ncol(hearteating)` columns x `r nrow(hearteating)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(hearteating[c(4:5, 15, 17)])
+cat(" \n Unique category")
+table(hearteating$category)
+cat(" \n Unique course")
+table(hearteating$course)
+cat(" \n Unique cuisine")
+table(hearteating$cuisine)
+
+# crazy how few recipes aren't "american" in any of these datasets. how many versions of chocolate chip cookie can you really do?
+
+```
+
+
+
+## Insanely Good Recipes
+
+`r ncol(insanecookies)` columns x `r nrow(insanecookies)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(insanecookies[c()])
+```
+
+
+## Lord Byron's Kitchen
+
+`r ncol(lordbyron)` columns x `r nrow(lordbyron)` rows
+
+## Maureen Abood
+
+`r ncol(maureenabood)` columns x `r nrow(maureenabood)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(maureenabood[c(1, 3:4, 11, 13)])
+```
+
+- Contains cookies without "cookie" in title ("Sitto’s Date Ma’amoul")
+
+## Modern Honey
+
+`r ncol(modernhoney)` columns x `r nrow(modernhoney)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(modernhoney[c()])
+```
+
+
+## Mommy's Home Cooking
+
+`r ncol(mommyscooking)` columns x `r nrow(mommyscooking)` rows
+
+Eggless recipes
+
+```{r echo = FALSE}
+# table(mommyscooking$cuisine), table(momyscooking$category), 
+summary(mommyscooking[c(1, 3:4, 13, 15)])
+```
+
+```{r message=FALSE, warning=FALSE}
+table(mommyscooking$cuisine)
+table(mommyscooking$category)
+```
+
+`r mommyscooking$customtime[1]`
+
+## Mia Kouppa
+
+`r ncol(kouppa)` columns x `r nrow(kouppa)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(kouppa[c(3:4, 12, 14)])
+table(kouppa$cuisine)
+table(kouppa$course)
+```
+
+- will contain cookie recipes that don't have "cookie" in the title, eg "Olive oil koulourakia with orange and cinnamon"
+
+## My Baking Addiction
+
+
+`r ncol(mybakingaddiction)` columns x `r nrow(mybakingaddiction)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(mybakingaddiction[c(1, 3:4, 10, 12)])
+```
+
+
+## Olive Magazine UK
+
+`r ncol(olivemagazine)` columns x `r nrow(olivemagazine)` rows
+
+
+## Preppy Kitchen
+
+`r ncol(preppycookies)` columns x `r nrow(preppycookies)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(preppycookies[c()])
+```
+
+
+
+
+
+
+## Sally's Baking Addiction
+
+`r ncol(sallysbaking)` columns x `r nrow(sallysbaking)` rows
+
+**Should all be cookies already** - scraped from the cookie category: https://sallysbakingaddiction.com/category/desserts/cookies
+
+```{r echo = FALSE}
+summary(sallysbaking[c(1:5, 10)])
+ncol(sallysbaking)
+nrow(sallysbaking)
+```
+
+**Notes**\
+- The ingredients weren't scraped properly, so some of them are "sections", or bits of html eg:\
+Cookies / For Decorating / Optional Topping Before Baking / Topping / Easy Icing / Rolling / Maple Icing / /wp:list\
+An easy way to filter for these will be to isolate ingredients that don't have any numbers in them, but there's also ingredients like "Assorted sprinkles" that have no digits and are ingredients\
+⚠️ Every non-ingredient will have added 1 to `totalingredients` for that recipe\
+That will need to be fixed (either by subtracting 1 every time you remove an ingredient or by redoing `totalingredients` after removing all non-ingredients) ⚠️ The ingredientX columns will need to be shifted when ingredients are removed from a recipe\
+
+Code used to fix this for another recipe should be usable for this too
+
+
+
+
+
+## Taste of Home
+
+`r ncol(tasteofhome)` columns x `r nrow(tasteofhome)` rows
+
+```{r echo = FALSE}
+summary(tasteofhome[c(1:2, 5:6, 11, 13)])
+```
+
+```{r message = FALSE, warning = FALSE}
+length(unique(tasteofhome$category))
+table(tasteofhome$category)
+
+```
+
+**Should all be cookies.** Scraped from the cookie section: https://www.tasteofhome.com/recipes/dishes-beverages/cookies
+
+**Notes:**\
+1. Has both "author" and "recipe submitter" (and tester, but that column can be removed)\
+2. The "time" and "yield" categories are off. This is what the first time column looks like: `r tasteofhome$times1[1]` , this is what the second time column looks like: `r tasteofhome$timesyield[1]` . "Total time" wasn't a number given on the recipes, so it will have to be calculated by adding together the other time values.
+
+
+
+
+
+
+
+
+
+
+## Taste of Lizzy T
+
+`r ncol(lizzyt)` columns x `r nrow(lizzyt)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(lizzyt[c()])
+```
+
+## Tasting Table
+
+[Tasting Table](https://www.tastingtable.com/category/cookie-recipes)
+
+`r ncol(tastingtable)` columns x `r nrow(tastingtable)` rows
+
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(tastingtable[c()])
+```
+
+
+## Veena Azamov Kitchen
+
+`r ncol(veena)` columns x `r nrow(veena)` rows
+```{r echo = FALSE}
+# title author rating/num yield totalingredients
+summary(veena[c(3:4, 11:13)]) 
+
+table(veena$cuisine)
+table(veena$course)
+```
+
+
+:::
+
+## Combined dataset
